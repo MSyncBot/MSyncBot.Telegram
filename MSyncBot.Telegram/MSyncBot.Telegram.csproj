@@ -7,4 +7,10 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="MDatabase" Version="1.0.0" />
+      <PackageReference Include="MLogger" Version="1.0.0" />
+      <PackageReference Include="Telegram.Bot" Version="19.0.0" />
+    </ItemGroup>
+
 </Project>
