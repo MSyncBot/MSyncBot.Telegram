@@ -53,7 +53,7 @@ public class Bot
         };
         
         var botClient = new TelegramBotClient(Token);
-        botClient.ReceiveAsync(
+        _ = botClient.ReceiveAsync(
                 new UpdateHandler().GetUpdatesAsync,
                 new ErrorHandler().GetApiError,
                 receiverOptions, 
