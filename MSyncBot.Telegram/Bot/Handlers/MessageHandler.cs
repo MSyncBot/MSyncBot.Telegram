@@ -1,4 +1,5 @@
-﻿using Telegram.Bot;
+﻿using MSyncBot.Telegram.Bot.Handlers.Server;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
@@ -6,6 +7,7 @@ namespace MSyncBot.Telegram.Bot.Handlers;
 
 public class MessageHandler
 {
+    
     public async Task MessageHandlerAsync(ITelegramBotClient botClient, Update update)
     {
         try
@@ -19,7 +21,12 @@ public class MessageHandler
                 case { Type: MessageType.Text }:
                     var text = message.Text;
                     if (IsBotCommand(text))
+                    {
                         await new CommandsHandler().CommandsHandlerAsync(botClient, update);
+                        return;
+                    }
+
+                    Bot.Server.SendAsync(message.Text);
                     return;
 
                 default:
