@@ -15,8 +15,7 @@ class Program
                 "####",
                 "####",
                 "####");
-
-        //await database.PingAsync();
+        
         logger.LogSuccess("Database has been initalized");
 
         var bot = new Bot.Bot("####", logger, database);
