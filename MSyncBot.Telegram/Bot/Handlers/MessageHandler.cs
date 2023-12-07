@@ -36,5 +36,5 @@ public class MessageHandler
         }
     }
     
-    private bool IsBotCommand(string text) => !string.IsNullOrEmpty(text) && text.StartsWith("/");
+    private static bool IsBotCommand(string text) => !string.IsNullOrEmpty(text) && text.StartsWith("/");
 }
