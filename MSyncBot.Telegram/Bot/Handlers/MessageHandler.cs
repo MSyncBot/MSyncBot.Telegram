@@ -13,9 +13,6 @@ public class MessageHandler
         try
         {
             var message = update.Message;
-
-            Bot.Logger.LogInformation("receive update");
-            
             switch (message)
             {
                 case { Type: MessageType.Text }:
