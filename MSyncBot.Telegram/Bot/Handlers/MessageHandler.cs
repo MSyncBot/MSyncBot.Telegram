@@ -23,7 +23,8 @@ public class MessageHandler
                         return;
                     }
 
-                    Bot.Server.SendAsync(message.Text);
+                    await Bot.Server.SendMessageAsync(Bot.Server.TcpClient.GetStream(), 
+                        new Client("MSyncBot.Telegram", ClientType.Telegram, message: message.Text));
                     return;
 
                 default:
