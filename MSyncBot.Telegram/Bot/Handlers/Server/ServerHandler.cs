@@ -1,7 +1,6 @@
 ﻿using System.Net.Sockets;
 using System.Text;
 using Newtonsoft.Json;
-using System;
 
 namespace MSyncBot.Telegram.Bot.Handlers.Server;
 
