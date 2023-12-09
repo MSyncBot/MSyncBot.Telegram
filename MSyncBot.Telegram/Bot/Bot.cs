@@ -65,9 +65,9 @@ public class Bot
             var stream = Server.TcpClient.GetStream();
             while (Server.TcpClient.Connected)
             {
-                var message = await Server.ReceiveMessageAsync(stream);
-                Logger.LogInformation(message);
-                await botClient.SendTextMessageAsync(823731104, message);
+                var client = await Server.ReceiveMessageAsync(stream);
+                Logger.LogInformation(client.Name + ": " + client.Message);
+                await botClient.SendTextMessageAsync(823731104, client.Name + ": " + client.Message);
             }
         }, cts.Token);
         
