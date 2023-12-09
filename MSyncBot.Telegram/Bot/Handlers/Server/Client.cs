@@ -1,43 +1,24 @@
-﻿using System.Net.Sockets;
-using System.Text;
-using Newtonsoft.Json;
-
-namespace MSyncBot.Telegram.Bot.Handlers.Server;
-
-public class Client
+﻿namespace MSyncBot.Telegram.Bot.Handlers.Server
 {
-    public string Name { get; set; }
-    public TcpClient TcpClient { get; }
-    public ClientType ClientType { get; set; }
-    public string? Message { get; set; }
-
-    public Client(string name, TcpClient tcpClient, ClientType clientType, string? message = null)
+    public class Client
     {
-        Name = name;
-        TcpClient = tcpClient;
-        ClientType = clientType;
-        Message = message;
-    }
-
-    public async Task SendAsync()
-    {
-        try
+        public string Name { get; }
+        public ClientType ClientType { get; set; }
+        public string? Message { get; set; }
+        
+        public Client(string name, ClientType clientType, string? message = null)
         {
-            var jsonData = JsonConvert.SerializeObject(this);
-            var data = Encoding.UTF8.GetBytes(jsonData);
-            await TcpClient.GetStream().WriteAsync(data);
-        }
-        catch (Exception ex)
-        {
-            Bot.Logger.LogError(ex.Message);
+            Name = name;
+            ClientType = clientType;
+            Message = message;
         }
     }
-}
 
-public enum ClientType
-{
-    Telegram,
-    Discord,
-    VK,
-    None
+    public enum ClientType
+    {
+        Telegram,
+        Discord,
+        VK,
+        None
+    }
 }
