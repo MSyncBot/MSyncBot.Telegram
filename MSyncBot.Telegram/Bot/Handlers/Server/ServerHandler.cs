@@ -9,7 +9,7 @@ public class ServerHandler
     private string IpAddress { get; set; }
     private const int Port = 1689;
     public TcpClient TcpClient { get; set; }
-
+    private Client Client { get; set; }
     public ServerHandler(string ipAddress)
     {
         IpAddress = ipAddress;
@@ -23,40 +23,63 @@ public class ServerHandler
             Bot.Logger.LogProcess($"Connection to server {IpAddress}:{Port}");
             await TcpClient.ConnectAsync(IpAddress, Port);
             Bot.Logger.LogSuccess("Bot has been successfully connected to the server.");
+
+            await SendClientDataAsync();
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Error connecting to the server: " + ex.Message);
+            Bot.Logger.LogError("Error connecting to the server: " + ex.Message);
         }
     }
-
-    public async Task<string> ReceiveMessageAsync(NetworkStream stream)
+    
+    private async Task SendClientDataAsync()
     {
         try
         {
-            var completeMessage = new StringBuilder();
-            var bufferSize = new byte[1024];
-           // while (stream.DataAvailable)
-            //{
-                var bytesRead = await stream.ReadAsync(bufferSize);
-                completeMessage.Append(Encoding.UTF8.GetString(bufferSize, 0, bytesRead));
-            //}
-            return completeMessage.ToString();
+            Bot.Logger.LogProcess("Sending client data to the server...");
+            
+            Client = new Client("MSyncBot.Telegram", ClientType.Telegram);
+            var stream = TcpClient.GetStream();
+            var serializedClient = JsonConvert.SerializeObject(Client);
+            var data = Encoding.UTF8.GetBytes(serializedClient);
+            await stream.WriteAsync(data);
+
+            Bot.Logger.LogSuccess("Client data has been sent to the server.");
+        }
+        catch (Exception ex)
+        {
+            Bot.Logger.LogError("Error sending client data: " + ex.Message);
+        }
+    }
+
+    public async Task<Client?> ReceiveMessageAsync(Stream stream)
+    {
+        try
+        {
+            var completeMessage = new byte[1024];
+            var bytesRead = await stream.ReadAsync(completeMessage);
+
+            if (bytesRead > 0)
+            {
+                var message = Encoding.UTF8.GetString(completeMessage, 0, bytesRead);
+                return JsonConvert.DeserializeObject<Client>(message);
+            }
         }
         catch (Exception ex)
         {
             Bot.Logger.LogError(ex.Message);
-            return string.Empty;
         }
+
+        return null;
     }
-    
-    public async Task SendAsync(string message)
+
+    public async Task SendMessageAsync(Stream stream, Client client)
     {
         try
         {
-            //var jsonData = JsonConvert.SerializeObject(this);
-            var data = Encoding.UTF8.GetBytes(message);
-            await TcpClient.GetStream().WriteAsync(data);
+            var serializedMessage = JsonConvert.SerializeObject(client);
+            var data = Encoding.UTF8.GetBytes(serializedMessage);
+            await stream.WriteAsync(data);
         }
         catch (Exception ex)
         {
