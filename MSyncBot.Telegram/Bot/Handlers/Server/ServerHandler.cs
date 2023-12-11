@@ -29,6 +29,7 @@ public class ServerHandler
         catch (Exception ex)
         {
             Bot.Logger.LogError("Error connecting to the server: " + ex.Message);
+            await ConnectToServerAsync();
         }
     }
     
