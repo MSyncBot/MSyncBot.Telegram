@@ -29,7 +29,7 @@ public class Bot
         Logger.LogSuccess("Bot has been initialized.");
     }
 
-    public async Task StartAsync()
+    public Task StartAsync()
     {
         Logger.LogProcess("Start receive updates...");
         
@@ -58,5 +58,6 @@ public class Bot
         Server.ConnectAsync();
         
         Logger.LogSuccess("Bot receiving updates.");
+        return Task.CompletedTask;
     }
 }
