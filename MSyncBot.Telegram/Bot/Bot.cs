@@ -1,13 +1,9 @@
 ﻿using System.Net;
-using System.Net.Sockets;
-using System.Runtime.InteropServices.JavaScript;
 using MLoggerService;
-using MSyncBot.Telegram.Bot.Handlers;
 using MSyncBot.Telegram.Bot.Handlers.General;
 using MSyncBot.Telegram.Bot.Handlers.Server;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
-using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
 namespace MSyncBot.Telegram.Bot;
