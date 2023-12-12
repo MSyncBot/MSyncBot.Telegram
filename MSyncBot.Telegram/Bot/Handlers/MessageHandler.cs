@@ -1,7 +1,9 @@
-﻿using MSyncBot.Telegram.Bot.Handlers.Server;
+﻿using System.Text.Json;
+using MSyncBot.Telegram.Bot.Handlers.Server;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Message = MSyncBot.Telegram.Bot.Handlers.Server.Message;
 
 namespace MSyncBot.Telegram.Bot.Handlers;
 
@@ -23,8 +25,10 @@ public class MessageHandler
                         return;
                     }
 
-                    await Bot.Server.SendMessageAsync(Bot.Server.TcpClient.GetStream(), 
-                        new Client("MSyncBot.Telegram", ClientType.Telegram, message: message.Text));
+                    var multiCastMessage = new Message("MSyncBot.Telegram", 1, SenderType.Telegram, message.Text);
+                    var jsonMessage = JsonSerializer.Serialize(multiCastMessage);
+                    Bot.Server.SendAsync(jsonMessage);
+                    
                     return;
 
                 default:

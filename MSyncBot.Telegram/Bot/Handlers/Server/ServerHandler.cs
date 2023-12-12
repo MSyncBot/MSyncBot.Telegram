@@ -1,104 +1,48 @@
-﻿using System.Net.Sockets;
+﻿using System.Net;
+using System.Net.Sockets;
 using System.Text;
-using Newtonsoft.Json;
+using System.Text.Json;
+using TcpClient = NetCoreServer.TcpClient;
 
 namespace MSyncBot.Telegram.Bot.Handlers.Server;
 
-public class ServerHandler
+public class ServerHandler(IPAddress address, int port) : TcpClient(address, port)
 {
-    private string IpAddress { get; set; }
-    private const int Port = 1689;
-    public TcpClient TcpClient { get; set; }
-    private Client Client { get; set; }
-    public ServerHandler(string ipAddress)
+    public void DisconnectAndStop()
     {
-        IpAddress = ipAddress;
-        TcpClient = new TcpClient();
-    }
-    
-    public async Task ConnectToServerAsync()
-    {
-        try
-        {
-            Bot.Logger.LogProcess($"Connection to server {IpAddress}:{Port}");
-            await TcpClient.ConnectAsync(IpAddress, Port);
-            Bot.Logger.LogSuccess("Bot has been successfully connected to the server.");
-
-            await SendClientDataAsync();
-        }
-        catch (Exception ex)
-        {
-            Bot.Logger.LogError("Error connecting to the server: " + ex.Message);
-            await ConnectToServerAsync();
-        }
-    }
-    
-    private async Task SendClientDataAsync()
-    {
-        try
-        {
-            Bot.Logger.LogProcess("Sending client data to the server...");
-            
-            Client = new Client("MSyncBot.Telegram", ClientType.Telegram);
-            var stream = TcpClient.GetStream();
-            var serializedClient = JsonConvert.SerializeObject(Client);
-            var data = Encoding.UTF8.GetBytes(serializedClient);
-            await stream.WriteAsync(data);
-
-            Bot.Logger.LogSuccess("Client data has been sent to the server.");
-        }
-        catch (Exception ex)
-        {
-            Bot.Logger.LogError("Error sending client data: " + ex.Message);
-        }
+        _stop = true;
+        DisconnectAsync();
+        while (IsConnected)
+            Thread.Yield();
     }
 
-    public async Task<Client?> ReceiveMessageAsync(Stream stream)
+    protected override void OnConnected()
     {
-        try
-        {
-            var completeMessage = new byte[1024];
-            var bytesRead = await stream.ReadAsync(completeMessage);
-
-            if (bytesRead > 0)
-            {
-                var message = Encoding.UTF8.GetString(completeMessage, 0, bytesRead);
-                return JsonConvert.DeserializeObject<Client>(message);
-            }
-        }
-        catch (Exception ex)
-        {
-            Bot.Logger.LogError(ex.Message);
-        }
-
-        return null;
+        Console.WriteLine($"Chat TCP client connected a new session with Id {Id}");
     }
 
-    public async Task SendMessageAsync(Stream stream, Client client)
+    protected override void OnDisconnected()
     {
-        try
-        {
-            var serializedMessage = JsonConvert.SerializeObject(client);
-            var data = Encoding.UTF8.GetBytes(serializedMessage);
-            await stream.WriteAsync(data);
-        }
-        catch (Exception ex)
-        {
-            Bot.Logger.LogError(ex.Message);
-        }
+        Console.WriteLine($"Chat TCP client disconnected a session with Id {Id}");
+        
+        Thread.Sleep(1000);
+        
+        if (!_stop)
+            ConnectAsync();
     }
 
-    public void Disconnect()
+    protected override void OnReceived(byte[] buffer, long offset, long size)
     {
-        try
-        {
-            Bot.Logger.LogProcess("Disconnecting from the server...");
-            TcpClient.Close();
-            Bot.Logger.LogSuccess("Bot has been successfully disconnected from the server.");
-        }
-        catch (Exception ex)
-        {
-           Bot.Logger.LogError("Error disconnecting from the server: " + ex.Message);
-        }
+        var jsonMessage = Encoding.UTF8.GetString(buffer, (int)offset, (int)size);
+        var receivedMessage = JsonSerializer.Deserialize<Message>(jsonMessage);
+
+        Bot.Logger.LogInformation($"Received message from {receivedMessage.SenderName}: {receivedMessage.Content}");
     }
+
+    protected override void OnError(SocketError error)
+    {
+        Console.WriteLine($"Chat TCP client caught an error with code {error}");
+    }
+
+    private bool _stop;
 }

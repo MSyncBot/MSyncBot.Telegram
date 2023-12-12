@@ -28,7 +28,7 @@ public class Bot
      
         Token = token;
         Database = database;
-        Server = new ServerHandler("127.0.0.1");
+        Server = new ServerHandler(IPAddress.Parse("127.0.0.1"), 1689);
         
         Logger.LogSuccess("Bot has been initialized.");
     }
@@ -58,18 +58,8 @@ public class Bot
                 new ErrorHandler().GetApiError,
                 receiverOptions, 
                 cancellationToken: cts.Token);
-
-        _ = Task.Run(async () =>
-        {
-            await Server.ConnectToServerAsync();
-            var stream = Server.TcpClient.GetStream();
-            while (Server.TcpClient.Connected)
-            {
-                var client = await Server.ReceiveMessageAsync(stream);
-                Logger.LogInformation(client.Name + ": " + client.Message);
-                await botClient.SendTextMessageAsync(823731104, client.Name + ": " + client.Message);
-            }
-        }, cts.Token);
+        
+        Server.ConnectAsync();
         
         Logger.LogSuccess("Bot receiving updates.");
     }
