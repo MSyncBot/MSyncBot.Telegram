@@ -13,7 +13,9 @@ public class Bot
     public static MLogger? Logger { get; set; }
     public static MDatabase.MDatabase? Database { get; set; }
 
-    public static ServerHandler Server { get; set; }
+    public static Client Server { get; set; }
+    
+    public static ITelegramBotClient BotClient { get; set; }
     
     private string Token { get; }
 
@@ -24,7 +26,7 @@ public class Bot
      
         Token = token;
         Database = database;
-        Server = new ServerHandler(IPAddress.Parse("127.0.0.1"), 1689);
+        Server = new Client("127.0.0.1", 8080);
         
         Logger.LogSuccess("Bot has been initialized.");
     }
@@ -48,8 +50,8 @@ public class Bot
             }
         };
         
-        var botClient = new TelegramBotClient(Token);
-        _ = botClient.ReceiveAsync(
+        BotClient = new TelegramBotClient(Token);
+        _ = BotClient.ReceiveAsync(
                 new UpdateHandler().GetUpdatesAsync,
                 new ErrorHandler().GetApiError,
                 receiverOptions, 
