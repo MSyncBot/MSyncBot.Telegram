@@ -1,13 +1,9 @@
 ﻿using System.Net;
-using System.Net.Sockets;
-using System.Runtime.InteropServices.JavaScript;
 using MLoggerService;
-using MSyncBot.Telegram.Bot.Handlers;
 using MSyncBot.Telegram.Bot.Handlers.General;
 using MSyncBot.Telegram.Bot.Handlers.Server;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
-using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
 namespace MSyncBot.Telegram.Bot;
@@ -17,7 +13,9 @@ public class Bot
     public static MLogger? Logger { get; set; }
     public static MDatabase.MDatabase? Database { get; set; }
 
-    public static ServerHandler Server { get; set; }
+    public static Client Server { get; set; }
+    
+    public static ITelegramBotClient BotClient { get; set; }
     
     private string Token { get; }
 
@@ -28,12 +26,12 @@ public class Bot
      
         Token = token;
         Database = database;
-        Server = new ServerHandler("127.0.0.1");
+        Server = new Client("127.0.0.1", 8080);
         
         Logger.LogSuccess("Bot has been initialized.");
     }
 
-    public async Task StartAsync()
+    public Task StartAsync()
     {
         Logger.LogProcess("Start receive updates...");
         
@@ -52,25 +50,16 @@ public class Bot
             }
         };
         
-        var botClient = new TelegramBotClient(Token);
-        _ = botClient.ReceiveAsync(
+        BotClient = new TelegramBotClient(Token);
+        _ = BotClient.ReceiveAsync(
                 new UpdateHandler().GetUpdatesAsync,
                 new ErrorHandler().GetApiError,
                 receiverOptions, 
                 cancellationToken: cts.Token);
-
-        _ = Task.Run(async () =>
-        {
-            await Server.ConnectToServerAsync();
-            var stream = Server.TcpClient.GetStream();
-            while (Server.TcpClient.Connected)
-            {
-                var client = await Server.ReceiveMessageAsync(stream);
-                Logger.LogInformation(client.Name + ": " + client.Message);
-                await botClient.SendTextMessageAsync(823731104, client.Name + ": " + client.Message);
-            }
-        }, cts.Token);
+        
+        Server.ConnectAsync();
         
         Logger.LogSuccess("Bot receiving updates.");
+        return Task.CompletedTask;
     }
 }

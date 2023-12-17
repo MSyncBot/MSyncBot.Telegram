@@ -1,7 +1,12 @@
-﻿using MSyncBot.Telegram.Bot.Handlers.Server;
+﻿using System.Text.Json;
+using MSyncBot.Telegram.Bot.Handlers.Server.Types;
+using MSyncBot.Telegram.Bot.Handlers.Server.Types.Enums;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
+using File = System.IO.File;
+using Message = MSyncBot.Telegram.Bot.Handlers.Server.Types.Message;
+using MessageType = Telegram.Bot.Types.Enums.MessageType;
+using User = MSyncBot.Telegram.Bot.Handlers.Server.Types.User;
 
 namespace MSyncBot.Telegram.Bot.Handlers;
 
@@ -23,9 +28,51 @@ public class MessageHandler
                         return;
                     }
 
-                    await Bot.Server.SendMessageAsync(Bot.Server.TcpClient.GetStream(), 
-                        new Client("MSyncBot.Telegram", ClientType.Telegram, message: message.Text));
+                    var textMessage = new Message("MSyncBot.Telegram",
+                        1,
+                        SenderType.Telegram,
+                        Server.Types.Enums.MessageType.Text,
+                        new User(message.From.FirstName))
+                        {
+                            Content = text
+                        };
+                    var jsonTextMessage = JsonSerializer.Serialize(textMessage);
+                    Bot.Server.SendTextAsync(jsonTextMessage);
                     return;
+                
+                case { Type: MessageType.Photo }:
+                {
+                    var photoId = update.Message.Photo.Last().FileId;
+                    var photoInfo = await botClient.GetFileAsync(photoId);
+                    var photoPath = photoInfo.FilePath;
+
+                    var photoName = Guid.NewGuid().ToString();
+                    const string extension = ".png";
+                    var destinationFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+                        "UserPhotos",
+                        $"{photoName}{extension}");
+                    
+                    await using (Stream fileStream = File.Create(destinationFilePath))
+                    {
+                        await botClient.DownloadFileAsync(
+                            filePath: photoPath,
+                            destination: fileStream);
+                    }
+
+                    var photoBytes = await File.ReadAllBytesAsync(destinationFilePath);
+                    
+                    var mediaFile = new MediaFile(photoName, extension, photoBytes, FileType.Photo);
+                    var photoMessage = new Message("MSyncBot.Telegram",
+                            1,
+                            SenderType.Telegram,
+                            Server.Types.Enums.MessageType.Photo,
+                            new User(message.From.FirstName));
+                    photoMessage.MediaFiles.Add(mediaFile);
+                    var jsonPhotoMessage = JsonSerializer.Serialize(photoMessage);
+                    Bot.Server.SendTextAsync(jsonPhotoMessage);
+                    File.Delete(destinationFilePath);
+                    return;
+                }
 
                 default:
                     throw new ArgumentOutOfRangeException();
