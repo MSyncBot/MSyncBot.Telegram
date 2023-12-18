@@ -68,20 +68,18 @@ public class Client : WsClient
             
                 case MessageType.Photo:
                 {
-                    Bot.Logger.LogInformation($"Received photo: {message.SenderName} - " +
-                        $"{message.MediaFiles[0].Name}{message.MediaFiles[0].Extension}");
-                    
-                    var userPhotosPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "UserPhotos");
-                    Directory.CreateDirectory(userPhotosPath);
-                    var filePath = Path.Combine(userPhotosPath, $"{message.MediaFiles[0].Name}{message.MediaFiles[0].Extension}");
-                    await File.WriteAllBytesAsync(filePath, message.MediaFiles[0].Data);
-                    
-                    await using Stream stream = File.OpenRead(filePath);
-                    await Bot.BotClient.SendPhotoAsync(chatId, new InputFileStream(stream),
-                        caption: $"Время, за которое сообщение пришло: {DateTime.Now - message.Timestamp}");
-                    
+                    Bot.Logger.LogInformation($"Received photo: {message.SenderName} - {message.MediaFiles[0].Name}{message.MediaFiles[0].Extension}");
+
+                    var photoBytes = message.MediaFiles[0].Data;
+                    using var memoryStream = new MemoryStream(photoBytes);
+                    await Bot.BotClient.SendPhotoAsync(
+                        chatId,
+                        new InputFileStream(memoryStream, $"{message.MediaFiles[0].Name}{message.MediaFiles[0].Extension}"),
+                        caption: $"Время, за которое сообщение пришло: {DateTime.Now - message.Timestamp}"
+                    );
                     return;
                 }
+
             } 
         });
     }
