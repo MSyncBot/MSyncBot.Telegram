@@ -3,24 +3,22 @@ using MSyncBot.Telegram.Bot.Handlers.Server.Types;
 using MSyncBot.Telegram.Bot.Handlers.Server.Types.Enums;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using File = System.IO.File;
-using Message = MSyncBot.Telegram.Bot.Handlers.Server.Types.Message;
 using MessageType = Telegram.Bot.Types.Enums.MessageType;
+using Message = MSyncBot.Telegram.Bot.Handlers.Server.Types.Message;
 using User = MSyncBot.Telegram.Bot.Handlers.Server.Types.User;
 
 namespace MSyncBot.Telegram.Bot.Handlers;
 
 public class MessageHandler
 {
-    
     public async Task MessageHandlerAsync(ITelegramBotClient botClient, Update update)
     {
         try
         {
             var message = update.Message;
-            switch (message)
+            switch (message.Type)
             {
-                case { Type: MessageType.Text }:
+                case MessageType.Text:
                     var text = message.Text;
                     if (IsBotCommand(text))
                     {
@@ -33,44 +31,64 @@ public class MessageHandler
                         SenderType.Telegram,
                         Server.Types.Enums.MessageType.Text,
                         new User(message.From.FirstName))
-                        {
-                            Content = text
-                        };
+                    {
+                        Content = text
+                    };
                     var jsonTextMessage = JsonSerializer.Serialize(textMessage);
                     Bot.Server.SendTextAsync(jsonTextMessage);
                     return;
-                
-                case { Type: MessageType.Photo }:
+
+                case MessageType.Photo:
                 {
-                    var photoId = update.Message.Photo.Last().FileId;
+                    var photoId = message.Photo.Last().FileId;
                     var photoInfo = await botClient.GetFileAsync(photoId);
                     var photoPath = photoInfo.FilePath;
 
-                    var photoName = Guid.NewGuid().ToString();
-                    const string extension = ".png";
-                    var destinationFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
-                        "UserPhotos",
-                        $"{photoName}{extension}");
-                    
-                    await using (Stream fileStream = File.Create(destinationFilePath))
-                    {
-                        await botClient.DownloadFileAsync(
-                            filePath: photoPath,
-                            destination: fileStream);
-                    }
+                    using var photoStream = new MemoryStream();
+                    await botClient.DownloadFileAsync(filePath: photoPath, destination: photoStream);
+                    photoStream.Seek(0, SeekOrigin.Begin);
 
-                    var photoBytes = await File.ReadAllBytesAsync(destinationFilePath);
-                    
-                    var mediaFile = new MediaFile(photoName, extension, photoBytes, FileType.Photo);
+                    var photoBytes = photoStream.ToArray();
+
+                    var photoFile = new MediaFile(Guid.NewGuid().ToString(), ".png", photoBytes, FileType.Photo);
                     var photoMessage = new Message("MSyncBot.Telegram",
-                            1,
-                            SenderType.Telegram,
-                            Server.Types.Enums.MessageType.Photo,
-                            new User(message.From.FirstName));
-                    photoMessage.MediaFiles.Add(mediaFile);
+                        1,
+                        SenderType.Telegram,
+                        Server.Types.Enums.MessageType.Photo,
+                        new User(message.From.FirstName));
+                    photoMessage.MediaFiles.Add(photoFile);
                     var jsonPhotoMessage = JsonSerializer.Serialize(photoMessage);
                     Bot.Server.SendTextAsync(jsonPhotoMessage);
-                    File.Delete(destinationFilePath);
+                    return;
+                }
+
+                case MessageType.Video:
+                case MessageType.VideoNote:
+                {
+                    var videoId = message.Type switch
+                    {
+                        MessageType.Video => message.Video.FileId,
+                        MessageType.VideoNote => message.VideoNote.FileId
+                    };
+                    
+                    var videoInfo = await botClient.GetFileAsync(videoId);
+                    var videoPath = videoInfo.FilePath;
+
+                    using var videoStream = new MemoryStream();
+                    await botClient.DownloadFileAsync(filePath: videoPath, destination: videoStream);
+                    videoStream.Seek(0, SeekOrigin.Begin);
+
+                    var videoBytes = videoStream.ToArray();
+
+                    var videoFile = new MediaFile(Guid.NewGuid().ToString(), ".mp4", videoBytes, FileType.Video);
+                    var videoMessage = new Message("MSyncBot.Telegram",
+                        1,
+                        SenderType.Telegram,
+                        Server.Types.Enums.MessageType.Video,
+                        new User(message.From.FirstName));
+                    videoMessage.MediaFiles.Add(videoFile);
+                    var jsonVideoMessage = JsonSerializer.Serialize(videoMessage);
+                    Bot.Server.SendTextAsync(jsonVideoMessage);
                     return;
                 }
 
@@ -83,6 +101,6 @@ public class MessageHandler
             Bot.Logger?.LogError(ex.ToString());
         }
     }
-    
+
     private static bool IsBotCommand(string text) => !string.IsNullOrEmpty(text) && text.StartsWith("/");
 }
