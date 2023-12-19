@@ -1,13 +1,11 @@
 ﻿using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
-using MSyncBot.Telegram.Bot.Handlers.Server.Types.Enums;
+using MSyncBot.Types.Enums;
 using NetCoreServer;
 using Telegram.Bot;
-using System.Drawing;
 using Telegram.Bot.Types;
-using File = System.IO.File;
-using Message = MSyncBot.Telegram.Bot.Handlers.Server.Types.Message;
+using Message = MSyncBot.Types.Message;
 
 namespace MSyncBot.Telegram.Bot.Handlers.Server;
 

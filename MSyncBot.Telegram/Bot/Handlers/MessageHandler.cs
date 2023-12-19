@@ -1,10 +1,8 @@
 ﻿using System.Text.Json;
-using MSyncBot.Telegram.Bot.Handlers.Server.Types.Enums;
+using MSyncBot.Types.Enums;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using MessageType = Telegram.Bot.Types.Enums.MessageType;
-using Message = MSyncBot.Telegram.Bot.Handlers.Server.Types.Message;
-using User = MSyncBot.Telegram.Bot.Handlers.Server.Types.User;
 
 namespace MSyncBot.Telegram.Bot.Handlers;
 
@@ -25,11 +23,11 @@ public class MessageHandler
                         return;
                     }
 
-                    var textMessage = new Message("MSyncBot.Telegram",
+                    var textMessage = new Types.Message("MSyncBot.Telegram",
                         1,
                         SenderType.Telegram,
-                        Server.Types.Enums.MessageType.Text,
-                        new User(message.From.FirstName))
+                        Types.Enums.MessageType.Text,
+                        new Types.User(message.From.FirstName))
                     {
                         Content = text
                     };

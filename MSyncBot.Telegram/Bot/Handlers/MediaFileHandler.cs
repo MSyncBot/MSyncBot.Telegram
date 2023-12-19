@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text.Json;
-using System.Threading.Tasks;
-using MSyncBot.Telegram.Bot.Handlers.Server.Types;
-using MSyncBot.Telegram.Bot.Handlers.Server.Types.Enums;
+﻿using System.Text.Json;
+using MSyncBot.Types;
+using MSyncBot.Types.Enums;
 using Telegram.Bot;
-using Telegram.Bot.Types;
 using Message = Telegram.Bot.Types.Message;
 using MessageType = Telegram.Bot.Types.Enums.MessageType;
 
@@ -76,11 +71,11 @@ namespace MSyncBot.Telegram.Bot.Handlers
                 photoBytes,
                 FileType.Photo);
             
-            var photoMessage = new Server.Types.Message("MSyncBot.Telegram",
+            var photoMessage = new Types.Message("MSyncBot.Telegram",
                 1,
                 SenderType.Telegram,
-                Server.Types.Enums.MessageType.Photo,
-                new Server.Types.User(message.From.FirstName));
+                Types.Enums.MessageType.Photo,
+                new Types.User(message.From.FirstName));
             photoMessage.MediaFiles.Add(photoFile);
             
             string? jsonPhotoMessage;
@@ -143,11 +138,11 @@ namespace MSyncBot.Telegram.Bot.Handlers
             string? jsonVideoMessage;
             if (string.IsNullOrEmpty(message.MediaGroupId))
             {
-                var videoMessage = new Server.Types.Message("MSyncBot.Telegram",
+                var videoMessage = new Types.Message("MSyncBot.Telegram",
                     1,
                     SenderType.Telegram,
-                    Server.Types.Enums.MessageType.Video,
-                    new Server.Types.User(message.From.FirstName));
+                    Types.Enums.MessageType.Video,
+                    new Types.User(message.From.FirstName));
                 videoMessage.MediaFiles.Add(videoFile);
                 jsonVideoMessage = JsonSerializer.Serialize(videoMessage);
                 Bot.Server.SendTextAsync(jsonVideoMessage);
@@ -187,11 +182,11 @@ namespace MSyncBot.Telegram.Bot.Handlers
             string? jsonAnimationMessage;
             if (string.IsNullOrEmpty(message.MediaGroupId))
             {
-                var animationMessage = new Server.Types.Message("MSyncBot.Telegram",
+                var animationMessage = new Types.Message("MSyncBot.Telegram",
                     1,
                     SenderType.Telegram,
-                    Server.Types.Enums.MessageType.Animation,
-                    new Server.Types.User(message.From.FirstName));
+                    Types.Enums.MessageType.Animation,
+                    new User(message.From.FirstName));
                 animationMessage.MediaFiles.Add(animationFile);
                 jsonAnimationMessage = JsonSerializer.Serialize(animationMessage);
                 Bot.Server.SendTextAsync(jsonAnimationMessage);
@@ -231,11 +226,11 @@ namespace MSyncBot.Telegram.Bot.Handlers
             string? jsonDocumentMessage;
             if (string.IsNullOrEmpty(message.MediaGroupId))
             {
-                var documentMessage = new Server.Types.Message("MSyncBot.Telegram",
+                var documentMessage = new Types.Message("MSyncBot.Telegram",
                     1,
                     SenderType.Telegram,
-                    Server.Types.Enums.MessageType.Document,
-                    new Server.Types.User(message.From.FirstName));
+                    Types.Enums.MessageType.Document,
+                    new Types.User(message.From.FirstName));
                 documentMessage.MediaFiles.Add(documentFile);
                 jsonDocumentMessage = JsonSerializer.Serialize(documentMessage);
                 Bot.Server.SendTextAsync(jsonDocumentMessage);
@@ -275,11 +270,11 @@ namespace MSyncBot.Telegram.Bot.Handlers
             string? jsonAudioMessage;
             if (string.IsNullOrEmpty(message.MediaGroupId))
             {
-                var audioMessage = new Server.Types.Message("MSyncBot.Telegram",
+                var audioMessage = new Types.Message("MSyncBot.Telegram",
                     1,
                     SenderType.Telegram,
-                    Server.Types.Enums.MessageType.Audio,
-                    new Server.Types.User(message.From.FirstName));
+                    Types.Enums.MessageType.Audio,
+                    new User(message.From.FirstName));
                 audioMessage.MediaFiles.Add(audioFile);
                 jsonAudioMessage = JsonSerializer.Serialize(audioMessage);
                 Bot.Server.SendTextAsync(jsonAudioMessage);
