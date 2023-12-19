@@ -4,5 +4,9 @@ public enum FileType
 {
     Photo,
     Video,
-    Voice
+    VideoNote,
+    Animation,
+    Audio,
+    Voice,
+    Document
 }
