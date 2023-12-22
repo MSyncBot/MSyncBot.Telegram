@@ -8,7 +8,7 @@ namespace MSyncBot.Telegram.Bot.Handlers;
 
 public class MessageHandler
 {
-    public async Task MessageHandlerAsync(ITelegramBotClient botClient, Update update)
+    public Task MessageHandlerAsync(ITelegramBotClient botClient, Update update)
     {
         try
         {
@@ -19,21 +19,24 @@ public class MessageHandler
                     var text = message.Text;
                     if (IsBotCommand(text))
                     {
-                        await new CommandsHandler().CommandsHandlerAsync(botClient, update);
-                        return;
+                        _ = Task.Run(async () => await new CommandsHandler().CommandsHandlerAsync(botClient, update));
+                        return Task.CompletedTask;
                     }
 
-                    var textMessage = new Types.Message("MSyncBot.Telegram",
-                        1,
-                        SenderType.Telegram,
-                        Types.Enums.MessageType.Text,
-                        new Types.User(message.From.FirstName))
+                    _ = Task.Run(() =>
                     {
-                        Content = text
-                    };
-                    var jsonTextMessage = JsonSerializer.Serialize(textMessage);
-                    Bot.Server.SendTextAsync(jsonTextMessage);
-                    return;
+                        var textMessage = new Types.Message("MSyncBot.Telegram",
+                            1,
+                            SenderType.Telegram,
+                            Types.Enums.MessageType.Text,
+                            new Types.User(message.From.FirstName))
+                        {
+                            Content = text
+                        };
+                        var jsonTextMessage = JsonSerializer.Serialize(textMessage);
+                        Bot.Server.SendTextAsync(jsonTextMessage);
+                    });
+                    return Task.CompletedTask; 
 
                 case MessageType.Photo:
                 case MessageType.Video:
@@ -42,9 +45,9 @@ public class MessageHandler
                 case MessageType.Audio:
                 case MessageType.Voice:
                 case MessageType.Document:
-                    MediaFileHandler.CountingMediaFiles(update.Message);
-                    await new MediaFileHandler().GetMediaFilesAsync(botClient, update.Message);
-                    return;
+                    MediaFileHandler.CountingMediaFiles(update.Message.MediaGroupId);
+                    _ = Task.Run(async () => await new MediaFileHandler().GetMediaFilesAsync(botClient, update.Message));
+                    return Task.CompletedTask;
 
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -54,6 +57,8 @@ public class MessageHandler
         {
             Bot.Logger?.LogError(ex.ToString());
         }
+
+        return Task.CompletedTask;
     }
 
     private static bool IsBotCommand(string text) => !string.IsNullOrEmpty(text) && text.StartsWith("/");
