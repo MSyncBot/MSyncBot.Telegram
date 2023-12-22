@@ -12,9 +12,7 @@ public class UpdateHandler
         switch (update)
         {
             case { Type: UpdateType.Message }:
-                Task.Run(async () => await new MessageHandler().MessageHandlerAsync(botClient, update),
-                    cancellationToken);
-                return Task.CompletedTask;
+                return new MessageHandler().MessageHandlerAsync(botClient, update);
         }
 
         return Task.CompletedTask;
