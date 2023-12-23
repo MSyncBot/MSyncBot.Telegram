@@ -10,8 +10,8 @@
     <ItemGroup>
       <PackageReference Include="MDatabase" Version="1.0.0" />
       <PackageReference Include="MLogger" Version="1.0.0" />
-      <PackageReference Include="MSyncBot.Types" Version="1.0.5" />
       <PackageReference Include="NetCoreServer" Version="8.0.4" />
+      <PackageReference Include="MSyncBot.Types" Version="1.0.8" />
       <PackageReference Include="Telegram.Bot" Version="19.0.0" />
     </ItemGroup>
 
