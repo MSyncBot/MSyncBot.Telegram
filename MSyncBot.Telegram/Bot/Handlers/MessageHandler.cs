@@ -25,18 +25,19 @@ public class MessageHandler
 
                     _ = Task.Run(() =>
                     {
+                        var user = message.From;
                         var textMessage = new Types.Message("MSyncBot.Telegram",
                             1,
                             SenderType.Telegram,
                             Types.Enums.MessageType.Text,
-                            new Types.User(message.From.FirstName))
+                            new Types.User(user.FirstName, user.LastName, user.Username, (ulong?)user.Id))
                         {
                             Content = text
                         };
                         var jsonTextMessage = JsonSerializer.Serialize(textMessage);
                         Bot.Server.SendTextAsync(jsonTextMessage);
                     });
-                    return Task.CompletedTask; 
+                    return Task.CompletedTask;
 
                 case MessageType.Photo:
                 case MessageType.Video:
