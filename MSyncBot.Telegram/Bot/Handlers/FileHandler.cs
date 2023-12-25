@@ -12,6 +12,7 @@ namespace MSyncBot.Telegram.Bot.Handlers
         private static readonly Dictionary<string, List<MediaFile>> MediaFiles = new();
         private static readonly Dictionary<string, int> CountMediaFiles = new();
         private static readonly Dictionary<string, int> SendingMediaFiles = new();
+        private static readonly Dictionary<string, string?> CaptionAlbum = new();
 
         public async Task FileHandlerAsync(ITelegramBotClient botClient, Message message)
         {
@@ -31,7 +32,10 @@ namespace MSyncBot.Telegram.Bot.Handlers
                     1,
                     SenderType.Telegram,
                     fileInfo.messageType,
-                    new User(user.FirstName, user.LastName, user.Username, (ulong?)user.Id));
+                    new User(user.FirstName, user.LastName, user.Username, (ulong?)user.Id))
+                {
+                    Content = message.Caption
+                };
 
                 fileMessage.MediaFiles.Add(file);
 
@@ -111,6 +115,7 @@ namespace MSyncBot.Telegram.Bot.Handlers
             {
                 mediaGroupFiles = [];
                 MediaFiles.Add(message.MediaGroupId, mediaGroupFiles);
+                CaptionAlbum.Add(message.MediaGroupId, message.Caption);
             }
 
             var fileInfo = GetFileInfo(message);
@@ -138,7 +143,10 @@ namespace MSyncBot.Telegram.Bot.Handlers
                     1,
                     SenderType.Telegram,
                     Types.Enums.MessageType.Album,
-                    new User(user.FirstName, user.LastName, user.Username, (ulong?)user.Id));
+                    new User(user.FirstName, user.LastName, user.Username, (ulong?)user.Id))
+                {
+                    Content = CaptionAlbum[message.MediaGroupId]
+                };
                 albumMessage.MediaFiles.AddRange(mediaGroupFiles);
 
                 var jsonAlbumMessage = JsonSerializer.Serialize(albumMessage);
@@ -146,6 +154,7 @@ namespace MSyncBot.Telegram.Bot.Handlers
 
                 SendingMediaFiles.Remove(message.MediaGroupId);
                 MediaFiles.Remove(message.MediaGroupId);
+                CaptionAlbum.Remove(message.MediaGroupId);
             }
         }
 
