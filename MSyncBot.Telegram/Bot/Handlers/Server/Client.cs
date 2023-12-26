@@ -51,7 +51,7 @@ public class Client : WsClient
             var jsonMessage = Encoding.UTF8.GetString(buffer, (int)offset, (int)size);
             var message = JsonSerializer.Deserialize<Message>(jsonMessage);
 
-            if (message.SenderType is SenderType.Telegram)
+            if (message.Messenger.Type is MessengerType.Telegram)
                 return;
             
             var chatId = -1001913731159;
@@ -59,7 +59,7 @@ public class Client : WsClient
             {
                 case MessageType.Text:
                     Bot.Logger.LogInformation(
-                        $"Received message from {message.SenderName}: " +
+                        $"Received message from {message.Messenger.Name}: " +
                         $"{message.User.FirstName} ({message.User.Id}) - {message.Content}");
 
                     await Bot.BotClient.SendTextMessageAsync(
@@ -71,7 +71,7 @@ public class Client : WsClient
 
                 case MessageType.Photo:
                     Bot.Logger.LogInformation(
-                        $"Received photo from {message.SenderName}: " +
+                        $"Received photo from {message.Messenger.Name}: " +
                         $"{message.User.FirstName} ({message.User.Id}) - " +
                         $"{message.MediaFiles[0].Name}{message.MediaFiles[0].Extension}");
 
@@ -92,7 +92,7 @@ public class Client : WsClient
 
                 case MessageType.Video:
                     Bot.Logger.LogInformation(
-                        $"Received video from {message.SenderName}: " +
+                        $"Received video from {message.Messenger.Name}: " +
                         $"{message.User.FirstName} ({message.User.Id}) - " +
                         $"{message.MediaFiles[0].Name}{message.MediaFiles[0].Extension}");
 
@@ -113,7 +113,7 @@ public class Client : WsClient
 
                 case MessageType.Audio:
                     Bot.Logger.LogInformation(
-                        $"Received audio from {message.SenderName}: " +
+                        $"Received audio from {message.Messenger.Name}: " +
                         $"{message.User.FirstName} ({message.User.Id}) - " +
                         $"{message.MediaFiles[0].Name}{message.MediaFiles[0].Extension}");
 
@@ -134,7 +134,7 @@ public class Client : WsClient
 
                 case MessageType.Document:
                     Bot.Logger.LogInformation(
-                        $"Received document from {message.SenderName}: " +
+                        $"Received document from {message.Messenger.Name}: " +
                         $"{message.User.FirstName} ({message.User.Id}) - " +
                         $"{message.MediaFiles[0].Name}{message.MediaFiles[0].Extension}");
 
@@ -156,7 +156,7 @@ public class Client : WsClient
                 case MessageType.Album:
                 {
                     Bot.Logger.LogInformation(
-                        $"Received album from {message.SenderName} with {message.MediaFiles.Count} files: " +
+                        $"Received album from {message.Messenger.Name} with {message.MediaFiles.Count} files: " +
                         $"{message.User.FirstName} ({message.User.Id})");
                     
                     var mediaFiles = new List<IAlbumInputMedia>();
@@ -169,7 +169,7 @@ public class Client : WsClient
                         var caption = string.IsNullOrEmpty(message.Content)
                             ? $"{message.User.FirstName}:"
                             : $"{message.User.FirstName}: {message.Content}";
-                        switch (file.FileType)
+                        switch (file.Type)
                         {
                             case FileType.Photo:
                                 var albumPhoto = new InputMediaPhoto(inputFile);

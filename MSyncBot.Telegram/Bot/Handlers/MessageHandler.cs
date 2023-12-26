@@ -1,8 +1,11 @@
 ﻿using System.Text.Json;
+using MSyncBot.Types;
 using MSyncBot.Types.Enums;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Chat = MSyncBot.Types.Chat;
 using MessageType = Telegram.Bot.Types.Enums.MessageType;
+using User = MSyncBot.Types.User;
 
 namespace MSyncBot.Telegram.Bot.Handlers;
 
@@ -13,6 +16,8 @@ public class MessageHandler
         try
         {
             var message = update.Message;
+            var user = message.From;
+            var chat = message.Chat;
             switch (message.Type)
             {
                 case MessageType.Text:
@@ -25,12 +30,11 @@ public class MessageHandler
 
                     _ = Task.Run(() =>
                     {
-                        var user = message.From;
-                        var textMessage = new Types.Message("MSyncBot.Telegram",
-                            1,
-                            SenderType.Telegram,
+                        var textMessage = new Types.Message(
+                            new Messenger("MSyncBot.Telegram", MessengerType.Telegram),
                             Types.Enums.MessageType.Text,
-                            new Types.User(user.FirstName, user.LastName, user.Username, (ulong?)user.Id))
+                            new User(user.FirstName, user.LastName, user.Username, (ulong?)user.Id),
+                            new Chat(chat.Title, (ulong)chat.Id))
                         {
                             Content = text
                         };
