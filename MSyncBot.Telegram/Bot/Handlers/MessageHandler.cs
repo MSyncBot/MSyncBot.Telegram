@@ -45,12 +45,13 @@ public class MessageHandler
                 case MessageType.Animation:
                 case MessageType.Audio:
                 case MessageType.Voice:
+                case MessageType.Sticker:
                 case MessageType.Document:
                     FileHandler.CountingMediaFiles(update.Message.MediaGroupId);
                     _ = Task.Run(async () =>
                         await new FileHandler().FileHandlerAsync(botClient, update.Message));
                     return Task.CompletedTask;
-
+                
                 default:
                     throw new ArgumentOutOfRangeException();
             }

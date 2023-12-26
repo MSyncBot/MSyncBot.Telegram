@@ -82,6 +82,10 @@ namespace MSyncBot.Telegram.Bot.Handlers
                     fileId = message.Animation.FileId;
                     messageType = Types.Enums.MessageType.Animation;
                     break;
+                case MessageType.Sticker:
+                    fileId = message.Sticker.FileId;
+                    messageType = Types.Enums.MessageType.Sticker;
+                    break;
             }
 
             return (fileId, messageType);

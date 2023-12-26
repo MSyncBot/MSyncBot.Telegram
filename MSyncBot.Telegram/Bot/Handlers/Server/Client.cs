@@ -53,7 +53,7 @@ public class Client : WsClient
 
             if (message.SenderType is SenderType.Telegram)
                 return;
-
+            
             var chatId = -1001913731159;
             switch (message.MessageType)
             {
