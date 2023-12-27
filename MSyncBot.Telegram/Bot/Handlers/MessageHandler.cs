@@ -51,9 +51,9 @@ public class MessageHandler
                 case MessageType.Voice:
                 case MessageType.Sticker:
                 case MessageType.Document:
-                    FileHandler.CountingMediaFiles(update.Message.MediaGroupId);
+                    FileHandler.CountingMediaFiles(message.MediaGroupId);
                     _ = Task.Run(async () =>
-                        await new FileHandler().FileHandlerAsync(botClient, update.Message));
+                        await new FileHandler().FileHandlerAsync(botClient, message));
                     return Task.CompletedTask;
                 
                 default:

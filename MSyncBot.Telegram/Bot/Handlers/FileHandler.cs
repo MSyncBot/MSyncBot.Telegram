@@ -1,10 +1,12 @@
 ﻿using System.Text.Json;
+using MSyncBot.Telegram.Bot.Data;
 using MSyncBot.Types;
 using MSyncBot.Types.Enums;
 using Telegram.Bot;
 using File = MSyncBot.Types.File;
 using Message = Telegram.Bot.Types.Message;
 using MessageType = Telegram.Bot.Types.Enums.MessageType;
+using User = MSyncBot.Types.User;
 
 namespace MSyncBot.Telegram.Bot.Handlers
 {
@@ -38,7 +40,7 @@ namespace MSyncBot.Telegram.Bot.Handlers
                     new Chat(chat.FirstName, (ulong)chat.Id)
                     {
                         InviteLink = chat.InviteLink,
-                        Photo = new File()
+                        //Photo = new File()
                     })
                 {
                     Content = message.Caption
@@ -98,7 +100,7 @@ namespace MSyncBot.Telegram.Bot.Handlers
             return (fileId, messageType);
         }
 
-        private static async Task<MediaFile?> DownloadFileToRamAsync(ITelegramBotClient botClient, string fileId,
+        private static async Task<File?> DownloadFileToRamAsync(ITelegramBotClient botClient, string fileId,
             FileType fileType)
         {
             if (string.IsNullOrEmpty(fileId))
@@ -112,7 +114,7 @@ namespace MSyncBot.Telegram.Bot.Handlers
             fileStream.Seek(0, SeekOrigin.Begin);
 
             var fileBytes = fileStream.ToArray();
-            var file = new MediaFile(Guid.NewGuid().ToString(),
+            var file = new File(Guid.NewGuid().ToString(),
                 Path.GetExtension(filePath),
                 fileBytes,
                 fileType);
@@ -146,27 +148,28 @@ namespace MSyncBot.Telegram.Bot.Handlers
                 SendingMediaFiles[message.MediaGroupId] = sentFiles;
             }
 
-            if (sentFiles == albumSize)
+            if (sentFiles != albumSize)
+                return;
+            
+            var user = message.From;
+            var chat = message.Chat;
+
+            var albumMessage = new Types.Message(
+                new Messenger("MSyncBot.Telegram", MessengerType.Telegram),
+                Types.Enums.MessageType.Text,
+                new User(user.FirstName, user.LastName, user.Username, (ulong?)user.Id),
+                new Chat(chat.Title, (ulong)chat.Id))
             {
-                var user = message.From;
+                Content = CaptionAlbum[message.MediaGroupId]
+            };
+            albumMessage.MediaFiles.AddRange(mediaGroupFiles);
 
-                var albumMessage = new Types.Message("MSyncBot.Telegram",
-                    1,
-                    SenderType.Telegram,
-                    Types.Enums.MessageType.Album,
-                    new User(user.FirstName, user.LastName, user.Username, (ulong?)user.Id))
-                {
-                    Content = CaptionAlbum[message.MediaGroupId]
-                };
-                albumMessage.MediaFiles.AddRange(mediaGroupFiles);
+            var jsonAlbumMessage = JsonSerializer.Serialize(albumMessage);
+            Bot.Server.SendTextAsync(jsonAlbumMessage);
 
-                var jsonAlbumMessage = JsonSerializer.Serialize(albumMessage);
-                Bot.Server.SendTextAsync(jsonAlbumMessage);
-
-                SendingMediaFiles.Remove(message.MediaGroupId);
-                MediaFiles.Remove(message.MediaGroupId);
-                CaptionAlbum.Remove(message.MediaGroupId);
-            }
+            SendingMediaFiles.Remove(message.MediaGroupId);
+            MediaFiles.Remove(message.MediaGroupId);
+            CaptionAlbum.Remove(message.MediaGroupId);
         }
 
         public static void CountingMediaFiles(string groupId)
