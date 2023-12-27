@@ -27,10 +27,10 @@ namespace MSyncBot.Telegram.Bot.Handlers
 
                 var user = message.From;
                 var chat = message.Chat;
-                
+
                 var fileInfo = GetFileInfo(message);
-                
                 var file = await DownloadFileToRamAsync(botClient, fileInfo.id, (FileType)fileInfo.messageType);
+                
                 var fileMessage = new Types.Message(
                     new Messenger("MSyncBot.Telegram", MessengerType.Telegram),
                     Types.Enums.MessageType.Text,
