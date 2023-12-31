@@ -55,16 +55,16 @@ public class Client : WsClient
                 return;
             
             var chatId = -1001913731159;
-            switch (message.MessageType)
+            switch (message.Type)
             {
                 case MessageType.Text:
                     Bot.Logger.LogInformation(
                         $"Received message from {message.Messenger.Name}: " +
-                        $"{message.User.FirstName} ({message.User.Id}) - {message.Content}");
+                        $"{message.User.FirstName} ({message.User.Id}) - {message.Text}");
 
                     await Bot.BotClient.SendTextMessageAsync(
                         chatId,
-                        $"{message.User.FirstName}: {message.Content}"
+                        $"{message.User.FirstName}: {message.Text}"
                     );
 
                     return;
@@ -73,16 +73,16 @@ public class Client : WsClient
                     Bot.Logger.LogInformation(
                         $"Received photo from {message.Messenger.Name}: " +
                         $"{message.User.FirstName} ({message.User.Id}) - " +
-                        $"{message.MediaFiles[0].Name}{message.MediaFiles[0].Extension}");
+                        $"{message.Files[0].Name}{message.Files[0].Extension}");
 
-                    var photoBytes = message.MediaFiles[0].Data;
+                    var photoBytes = message.Files[0].Data;
                     var photoStream = new MemoryStream(photoBytes);
                     var photo = new InputFileStream(photoStream,
-                        $"{message.MediaFiles[0].Name}{message.MediaFiles[0].Extension}");
+                        $"{message.Files[0].Name}{message.Files[0].Extension}");
 
-                    var photoCaption = string.IsNullOrEmpty(message.Content)
+                    var photoCaption = string.IsNullOrEmpty(message.Text)
                         ? $"{message.User.FirstName}:"
-                        : $"{message.User.FirstName}: {message.Content}";
+                        : $"{message.User.FirstName}: {message.Text}";
 
                     await Bot.BotClient.SendPhotoAsync(chatId,
                         photo,
@@ -94,16 +94,16 @@ public class Client : WsClient
                     Bot.Logger.LogInformation(
                         $"Received video from {message.Messenger.Name}: " +
                         $"{message.User.FirstName} ({message.User.Id}) - " +
-                        $"{message.MediaFiles[0].Name}{message.MediaFiles[0].Extension}");
+                        $"{message.Files[0].Name}{message.Files[0].Extension}");
 
-                    var videoBytes = message.MediaFiles[0].Data;
+                    var videoBytes = message.Files[0].Data;
                     var videoStream = new MemoryStream(videoBytes);
                     var video = new InputFileStream(videoStream,
-                        $"{message.MediaFiles[0].Name}{message.MediaFiles[0].Extension}");
+                        $"{message.Files[0].Name}{message.Files[0].Extension}");
 
-                    var videoCaption = string.IsNullOrEmpty(message.Content)
+                    var videoCaption = string.IsNullOrEmpty(message.Text)
                         ? $"{message.User.FirstName}:"
-                        : $"{message.User.FirstName}: {message.Content}";
+                        : $"{message.User.FirstName}: {message.Text}";
 
                     await Bot.BotClient.SendVideoAsync(chatId,
                         video,
@@ -115,16 +115,16 @@ public class Client : WsClient
                     Bot.Logger.LogInformation(
                         $"Received audio from {message.Messenger.Name}: " +
                         $"{message.User.FirstName} ({message.User.Id}) - " +
-                        $"{message.MediaFiles[0].Name}{message.MediaFiles[0].Extension}");
+                        $"{message.Files[0].Name}{message.Files[0].Extension}");
 
-                    var audioBytes = message.MediaFiles[0].Data;
+                    var audioBytes = message.Files[0].Data;
                     var audioStream = new MemoryStream(audioBytes);
                     var audio = new InputFileStream(audioStream,
-                        $"{message.MediaFiles[0].Name}{message.MediaFiles[0].Extension}");
+                        $"{message.Files[0].Name}{message.Files[0].Extension}");
 
-                    var audioCaption = string.IsNullOrEmpty(message.Content)
+                    var audioCaption = string.IsNullOrEmpty(message.Text)
                         ? $"{message.User.FirstName}:"
-                        : $"{message.User.FirstName}: {message.Content}";
+                        : $"{message.User.FirstName}: {message.Text}";
 
                     await Bot.BotClient.SendAudioAsync(chatId,
                         audio,
@@ -136,16 +136,16 @@ public class Client : WsClient
                     Bot.Logger.LogInformation(
                         $"Received document from {message.Messenger.Name}: " +
                         $"{message.User.FirstName} ({message.User.Id}) - " +
-                        $"{message.MediaFiles[0].Name}{message.MediaFiles[0].Extension}");
+                        $"{message.Files[0].Name}{message.Files[0].Extension}");
 
-                    var documentBytes = message.MediaFiles[0].Data;
+                    var documentBytes = message.Files[0].Data;
                     var documentStream = new MemoryStream(documentBytes);
                     var document = new InputFileStream(documentStream,
-                        $"{message.MediaFiles[0].Name}{message.MediaFiles[0].Extension}");
+                        $"{message.Files[0].Name}{message.Files[0].Extension}");
 
-                    var documentCaption = string.IsNullOrEmpty(message.Content)
+                    var documentCaption = string.IsNullOrEmpty(message.Text)
                         ? $"{message.User.FirstName}:"
-                        : $"{message.User.FirstName}: {message.Content}";
+                        : $"{message.User.FirstName}: {message.Text}";
 
                     await Bot.BotClient.SendDocumentAsync(chatId,
                         document,
@@ -156,44 +156,44 @@ public class Client : WsClient
                 case MessageType.Album:
                 {
                     Bot.Logger.LogInformation(
-                        $"Received album from {message.Messenger.Name} with {message.MediaFiles.Count} files: " +
+                        $"Received album from {message.Messenger.Name} with {message.Files.Count} files: " +
                         $"{message.User.FirstName} ({message.User.Id})");
                     
-                    var mediaFiles = new List<IAlbumInputMedia>();
+                    var files = new List<IAlbumInputMedia>();
                     var isFirstMediaFile = true;
-                    foreach (var file in message.MediaFiles)
+                    foreach (var file in message.Files)
                     {
                         var fileStream = new MemoryStream(file.Data);
                         var inputFile = new InputFileStream(fileStream, $"{file.Name}{file.Extension}");
 
-                        var caption = string.IsNullOrEmpty(message.Content)
+                        var caption = string.IsNullOrEmpty(message.Text)
                             ? $"{message.User.FirstName}:"
-                            : $"{message.User.FirstName}: {message.Content}";
+                            : $"{message.User.FirstName}: {message.Text}";
                         switch (file.Type)
                         {
                             case FileType.Photo:
                                 var albumPhoto = new InputMediaPhoto(inputFile);
                                 if (isFirstMediaFile)
                                     albumPhoto.Caption = caption;
-                                mediaFiles.Add(albumPhoto);
+                                files.Add(albumPhoto);
                                 break;
                             case FileType.Video:
                                 var albumVideo = new InputMediaVideo(inputFile);
                                 if (isFirstMediaFile)
                                     albumVideo.Caption = caption;
-                                mediaFiles.Add(albumVideo);
+                                files.Add(albumVideo);
                                 break;
                             /*case FileType.Document:
                                 var albumDocument = new InputMediaDocument(inputFile);
                                 if (isFirstMediaFile)
                                     albumDocument.Caption = caption;
-                                mediaFiles.Add(albumDocument);
+                                Files.Add(albumDocument);
                                 break;
                             case FileType.Audio:
                                 var albumAudio = new InputMediaAudio(inputFile);
                                 if (isFirstMediaFile)
                                     albumAudio.Caption = caption;
-                                mediaFiles.Add(albumAudio);
+                                Files.Add(albumAudio);
                                 break;*/
                             default:
                             case FileType.Unknown:
@@ -204,7 +204,7 @@ public class Client : WsClient
                     }
 
                     await Bot.BotClient.SendMediaGroupAsync(chatId,
-                        mediaFiles);
+                        files);
 
                     return;
                 }

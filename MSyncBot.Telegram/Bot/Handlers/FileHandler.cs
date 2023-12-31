@@ -32,21 +32,25 @@ namespace MSyncBot.Telegram.Bot.Handlers
 
                 var fileInfo = GetFileInfo(message);
                 var file = await DownloadFileToRamAsync(botClient, fileInfo.id, (FileType)fileInfo.messageType);
-                
+
                 var fileMessage = new Types.Message(
                     new Messenger("MSyncBot.Telegram", MessengerType.Telegram),
                     Types.Enums.MessageType.Text,
-                    new User(user.FirstName, user.LastName, user.Username, (ulong?)user.Id),
+                    new User(user.FirstName, (ulong)user.Id)
+                    {
+                        LastName = user.FirstName,
+                        Username = user.Username
+                    },
                     new Chat(chat.FirstName, (ulong)chat.Id)
                     {
                         InviteLink = chat.InviteLink,
                         //Photo = new File()
                     })
                 {
-                    Content = message.Caption
+                    Text = message.Caption
                 };
 
-                fileMessage.MediaFiles.Add(file);
+                fileMessage.Files.Add(file);
 
                 var jsonFileMessage = JsonSerializer.Serialize(fileMessage);
                 Bot.Server.SendTextAsync(jsonFileMessage);
@@ -150,19 +154,23 @@ namespace MSyncBot.Telegram.Bot.Handlers
 
             if (sentFiles != albumSize)
                 return;
-            
+
             var user = message.From;
             var chat = message.Chat;
 
             var albumMessage = new Types.Message(
                 new Messenger("MSyncBot.Telegram", MessengerType.Telegram),
                 Types.Enums.MessageType.Text,
-                new User(user.FirstName, user.LastName, user.Username, (ulong?)user.Id),
+                new User(user.FirstName, (ulong)user.Id)
+                {
+                    LastName = user.LastName,
+                    Username = user.Username
+                },
                 new Chat(chat.Title, (ulong)chat.Id))
             {
-                Content = CaptionAlbum[message.MediaGroupId]
+                Text = CaptionAlbum[message.MediaGroupId]
             };
-            albumMessage.MediaFiles.AddRange(mediaGroupFiles);
+            albumMessage.Files.AddRange(mediaGroupFiles);
 
             var jsonAlbumMessage = JsonSerializer.Serialize(albumMessage);
             Bot.Server.SendTextAsync(jsonAlbumMessage);

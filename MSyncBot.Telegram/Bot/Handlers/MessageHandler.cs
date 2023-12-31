@@ -33,10 +33,14 @@ public class MessageHandler
                         var textMessage = new Types.Message(
                             new Messenger("MSyncBot.Telegram", MessengerType.Telegram),
                             Types.Enums.MessageType.Text,
-                            new User(user.FirstName, user.LastName, user.Username, (ulong?)user.Id),
+                            new User(user.FirstName, (ulong)user.Id)
+                            {
+                                LastName = user.LastName,
+                                Username = user.Username,
+                            },
                             new Chat(chat.Title, (ulong)chat.Id))
                         {
-                            Content = text
+                            Text = text
                         };
                         var jsonTextMessage = JsonSerializer.Serialize(textMessage);
                         Bot.Server.SendTextAsync(jsonTextMessage);
