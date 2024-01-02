@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using MSyncBot.Telegram.Bot.Handlers.Server;
 using MSyncBot.Types;
 using MSyncBot.Types.Enums;
 using Telegram.Bot;
@@ -18,6 +19,9 @@ public class MessageHandler
             var message = update.Message;
             var user = message.From;
             var chat = message.Chat;
+
+            ReceivedMessageHandler.LastUserId = (ulong)user.Id;
+            
             switch (message.Type)
             {
                 case MessageType.Text:
