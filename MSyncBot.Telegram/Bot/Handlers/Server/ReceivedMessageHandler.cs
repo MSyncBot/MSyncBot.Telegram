@@ -1,51 +1,20 @@
-﻿using System.Net.Sockets;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
 using MSyncBot.Types.Enums;
-using NetCoreServer;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
+using FileType = MSyncBot.Types.Enums.FileType;
 using Message = MSyncBot.Types.Message;
+using MessageType = MSyncBot.Types.Enums.MessageType;
 
 namespace MSyncBot.Telegram.Bot.Handlers.Server;
 
-public class Client : WsClient
+public class ReceivedMessageHandler
 {
-    public Client(string address, int port) : base(address, port) { }
+    public static ulong LastUserId;
 
-    public void DisconnectAndStop()
-    {
-        _stop = true;
-        CloseAsync(1000);
-        while (IsConnected)
-            Thread.Yield();
-    }
-
-    public override void OnWsConnecting(HttpRequest request)
-    {
-        request.SetBegin("GET", "/");
-        request.SetHeader("Host", "localhost");
-        request.SetHeader("Origin", "http://localhost");
-        request.SetHeader("Upgrade", "websocket");
-        request.SetHeader("Connection", "Upgrade");
-        request.SetHeader("Sec-WebSocket-Key", Convert.ToBase64String(WsNonce));
-        request.SetHeader("Sec-WebSocket-Protocol", "chat, superchat");
-        request.SetHeader("Sec-WebSocket-Version", "13");
-        request.SetBody();
-    }
-
-    public override void OnWsConnected(HttpResponse response)
-    {
-        Bot.Logger.LogSuccess($"Chat WebSocket client connected a new session with Id {Id}");
-    }
-
-    public override void OnWsDisconnected()
-    {
-        Bot.Logger.LogError($"Chat WebSocket client disconnected a session with Id {Id}");
-    }
-
-    public override void OnWsReceived(byte[] buffer, long offset, long size)
-    {
+    public void ReceiveMessage(byte[] buffer, long offset, long size) =>
         Task.Run(async () =>
         {
             var jsonMessage = Encoding.UTF8.GetString(buffer, (int)offset, (int)size);
@@ -53,8 +22,8 @@ public class Client : WsClient
 
             if (message.Messenger.Type is MessengerType.Telegram)
                 return;
-            
-            var chatId = -1001913731159;
+
+            var chatId = -1001491737336;
             switch (message.Type)
             {
                 case MessageType.Text:
@@ -62,9 +31,16 @@ public class Client : WsClient
                         $"Received message from {message.Messenger.Name}: " +
                         $"{message.User.FirstName} ({message.User.Id}) - {message.Text}");
 
+                    var messageText = LastUserId != message.User.Id
+                        ? $"<code>{message.Messenger.Type}:</code> {message.User.FirstName}\n{message.Text}"
+                        : message.Text;
+
+                    LastUserId = message.User.Id;
+
                     await Bot.BotClient.SendTextMessageAsync(
                         chatId,
-                        $"{message.User.FirstName}: {message.Text}"
+                        messageText,
+                        parseMode: ParseMode.Html
                     );
 
                     return;
@@ -158,7 +134,7 @@ public class Client : WsClient
                     Bot.Logger.LogInformation(
                         $"Received album from {message.Messenger.Name} with {message.Files.Count} files: " +
                         $"{message.User.FirstName} ({message.User.Id})");
-                    
+
                     var files = new List<IAlbumInputMedia>();
                     var isFirstMediaFile = true;
                     foreach (var file in message.Files)
@@ -210,24 +186,4 @@ public class Client : WsClient
                 }
             }
         });
-    }
-
-    protected override void OnDisconnected()
-    {
-        base.OnDisconnected();
-
-        Bot.Logger.LogError($"Chat WebSocket client disconnected a session with Id {Id}");
-
-        Thread.Sleep(1000);
-
-        if (!_stop)
-            ConnectAsync();
-    }
-
-    protected override void OnError(SocketError error)
-    {
-        Bot.Logger.LogError($"Chat WebSocket client caught an error with code {error}");
-    }
-
-    private bool _stop;
 }

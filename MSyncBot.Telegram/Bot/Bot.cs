@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using MLoggerService;
+using MSyncBot.Telegram.Bot.Handlers;
 using MSyncBot.Telegram.Bot.Handlers.General;
 using MSyncBot.Telegram.Bot.Handlers.Server;
 using Telegram.Bot;
@@ -13,7 +14,7 @@ public class Bot
     public static MLogger? Logger { get; set; }
     public static MDatabase.MDatabase? Database { get; set; }
 
-    public static Client Server { get; set; }
+    public static ServerHandler Server { get; set; }
     
     public static ITelegramBotClient BotClient { get; set; }
     
@@ -26,7 +27,7 @@ public class Bot
      
         Token = token;
         Database = database;
-        Server = new Client("127.0.0.1", 1689);
+        Server = new ServerHandler("127.0.0.1", 1689);
         
         Logger.LogSuccess("Bot has been initialized.");
     }
