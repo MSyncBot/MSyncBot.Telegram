@@ -35,7 +35,7 @@ namespace MSyncBot.Telegram.Bot.Handlers
 
                 var fileMessage = new Types.Message(
                     new Messenger("MSyncBot.Telegram", MessengerType.Telegram),
-                    Types.Enums.MessageType.Text,
+                    fileInfo.messageType,
                     new User(user.FirstName, (ulong)user.Id)
                     {
                         LastName = user.FirstName,
@@ -160,7 +160,7 @@ namespace MSyncBot.Telegram.Bot.Handlers
 
             var albumMessage = new Types.Message(
                 new Messenger("MSyncBot.Telegram", MessengerType.Telegram),
-                Types.Enums.MessageType.Text,
+                fileInfo.messageType,
                 new User(user.FirstName, (ulong)user.Id)
                 {
                     LastName = user.LastName,
