@@ -38,7 +38,7 @@ namespace MSyncBot.Telegram.Bot.Handlers
                     fileInfo.messageType,
                     new User(user.FirstName, (ulong)user.Id)
                     {
-                        LastName = user.FirstName,
+                        LastName = user.LastName,
                         Username = user.Username
                     },
                     new Chat(chat.FirstName, (ulong)chat.Id)
@@ -163,7 +163,7 @@ namespace MSyncBot.Telegram.Bot.Handlers
                 fileInfo.messageType,
                 new User(user.FirstName, (ulong)user.Id)
                 {
-                    LastName = user.LastName,
+                    LastName = user.LastName, 
                     Username = user.Username
                 },
                 new Chat(chat.Title, (ulong)chat.Id))
