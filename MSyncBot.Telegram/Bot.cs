@@ -18,13 +18,17 @@ public class Bot
     
     private string Token { get; }
 
-    public Bot(string token, MLogger logger)
+    public Bot(
+        string token,
+        string serverIp,
+        int serverPort,
+        MLogger logger)
     {
         Logger = logger;
         Logger.LogProcess("Initializing bot...");
      
         Token = token;
-        Server = new ServerHandler("127.0.0.1", 1689);
+        Server = new ServerHandler(serverIp, serverPort);
         
         Logger.LogSuccess("Bot has been initialized.");
     }
