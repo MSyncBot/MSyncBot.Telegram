@@ -42,14 +42,14 @@ public class Bot
         var receiverOptions = new ReceiverOptions()
         {
             ThrowPendingUpdates = true,
-            AllowedUpdates = new[]
-            {
+            AllowedUpdates =
+            [
                 UpdateType.Message,
                 UpdateType.CallbackQuery,
                 UpdateType.ChatMember,
                 UpdateType.MyChatMember,
                 UpdateType.EditedMessage
-            }
+            ]
         };
         
         _cancellationTokenSource = new CancellationTokenSource();
