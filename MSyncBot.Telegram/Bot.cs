@@ -12,7 +12,7 @@ public class Bot
     public static MLogger? Logger { get; private set; }
     public static ServerHandler? Server { get; private set; }
     
-    public static ITelegramBotClient BotClient { get; private set; }
+    public static ITelegramBotClient? BotClient { get; private set; }
     
     private CancellationTokenSource? _cancellationTokenSource;
     
