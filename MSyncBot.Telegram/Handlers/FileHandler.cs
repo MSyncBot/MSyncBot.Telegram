@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using MSyncBot.Telegram.Bot.Data;
 using MSyncBot.Types;
 using MSyncBot.Types.Enums;
 using Telegram.Bot;
@@ -8,7 +7,7 @@ using Message = Telegram.Bot.Types.Message;
 using MessageType = Telegram.Bot.Types.Enums.MessageType;
 using User = MSyncBot.Types.User;
 
-namespace MSyncBot.Telegram.Bot.Handlers
+namespace MSyncBot.Telegram.Handlers
 {
     public class FileHandler
     {

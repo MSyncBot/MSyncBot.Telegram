@@ -1,13 +1,11 @@
-﻿using System.Net;
-using MLoggerService;
-using MSyncBot.Telegram.Bot.Handlers;
-using MSyncBot.Telegram.Bot.Handlers.General;
-using MSyncBot.Telegram.Bot.Handlers.Server;
+﻿using MLoggerService;
+using MSyncBot.Telegram.Handlers.General;
+using MSyncBot.Telegram.Handlers.Server;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types.Enums;
 
-namespace MSyncBot.Telegram.Bot;
+namespace MSyncBot.Telegram;
 
 public class Bot
 {

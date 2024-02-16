@@ -8,7 +8,7 @@ using FileType = MSyncBot.Types.Enums.FileType;
 using Message = MSyncBot.Types.Message;
 using MessageType = MSyncBot.Types.Enums.MessageType;
 
-namespace MSyncBot.Telegram.Bot.Handlers.Server;
+namespace MSyncBot.Telegram.Handlers.Server;
 
 public class ReceivedMessageHandler
 {

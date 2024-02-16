@@ -2,7 +2,7 @@
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-namespace MSyncBot.Telegram.Bot.Handlers.General;
+namespace MSyncBot.Telegram.Handlers.General;
 
 public class UpdateHandler
 {

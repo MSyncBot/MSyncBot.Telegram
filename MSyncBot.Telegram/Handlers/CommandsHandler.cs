@@ -1,9 +1,8 @@
-﻿using MSyncBot.Telegram.Bot.Commands;
+﻿using MSyncBot.Telegram.Commands;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
 
-namespace MSyncBot.Telegram.Bot.Handlers;
+namespace MSyncBot.Telegram.Handlers;
 
 public class CommandsHandler
 {

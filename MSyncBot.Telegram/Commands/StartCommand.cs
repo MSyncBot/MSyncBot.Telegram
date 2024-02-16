@@ -1,7 +1,7 @@
 ﻿using Telegram.Bot;
 using Telegram.Bot.Types;
 
-namespace MSyncBot.Telegram.Bot.Commands;
+namespace MSyncBot.Telegram.Commands;
 
 public class StartCommand
 {

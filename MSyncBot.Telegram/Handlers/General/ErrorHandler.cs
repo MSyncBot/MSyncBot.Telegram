@@ -1,7 +1,7 @@
 ﻿using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 
-namespace MSyncBot.Telegram.Bot.Handlers.General;
+namespace MSyncBot.Telegram.Handlers.General;
 
 public class ErrorHandler
 {

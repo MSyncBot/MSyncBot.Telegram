@@ -1,4 +1,4 @@
-﻿namespace MSyncBot.Telegram.Bot.Data;
+﻿namespace MSyncBot.Telegram.Data;
 
 public class User : global::Telegram.Bot.Types.User
 {

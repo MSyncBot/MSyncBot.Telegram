@@ -1,13 +1,7 @@
 ﻿using System.Net.Sockets;
-using System.Text;
-using System.Text.Json;
-using MSyncBot.Types.Enums;
 using NetCoreServer;
-using Telegram.Bot;
-using Telegram.Bot.Types;
-using Message = MSyncBot.Types.Message;
 
-namespace MSyncBot.Telegram.Bot.Handlers.Server;
+namespace MSyncBot.Telegram.Handlers.Server;
 
 public class ServerHandler(string address, int port) : WsClient(address, port)
 {
