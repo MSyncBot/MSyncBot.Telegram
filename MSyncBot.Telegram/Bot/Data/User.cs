@@ -17,7 +17,7 @@ public class User : global::Telegram.Bot.Types.User
     public bool IsAdministrator { get; set; }
     public int? AdministratorLevel { get; set; }
 
-    public async Task AddAsync()
+    /*public async Task AddAsync()
     {
         try
         {
@@ -110,5 +110,5 @@ public class User : global::Telegram.Bot.Types.User
         {
             Bot.Logger.LogError(ex.ToString());
         }
-    }
+    }*/
 }
