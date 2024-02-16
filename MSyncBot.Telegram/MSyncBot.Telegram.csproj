@@ -9,6 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="MConfiguration" Version="1.0.1" />
       <PackageReference Include="MLogger" Version="1.0.0" />
       <PackageReference Include="MSyncBot.Types" Version="2.0.3" />
       <PackageReference Include="NetCoreServer" Version="8.0.7" />
