@@ -14,6 +14,8 @@ public class Bot
     
     public static ITelegramBotClient BotClient { get; private set; }
     
+    private CancellationTokenSource? _cancellationTokenSource;
+    
     private string Token { get; }
 
     public Bot(string token, MLogger logger)
@@ -46,6 +48,8 @@ public class Bot
             }
         };
         
+        _cancellationTokenSource = new CancellationTokenSource();
+        
         BotClient = new TelegramBotClient(Token);
         _ = BotClient.ReceiveAsync(
                 new UpdateHandler().GetUpdatesAsync,
@@ -57,5 +61,12 @@ public class Bot
         
         Logger.LogSuccess("Bot receiving updates.");
         return Task.CompletedTask;
+    }
+    
+    public async Task StopAsync()
+    {
+        Logger.LogProcess("Stopping bot...");
+        await _cancellationTokenSource.CancelAsync();
+        Logger.LogSuccess("Bot stopped");
     }
 }
