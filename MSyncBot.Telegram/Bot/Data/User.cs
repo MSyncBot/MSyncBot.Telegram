@@ -1,7 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using MySql.Data.MySqlClient;
-
-namespace MSyncBot.Telegram.Bot.Data;
+﻿namespace MSyncBot.Telegram.Bot.Data;
 
 public class User : global::Telegram.Bot.Types.User
 {

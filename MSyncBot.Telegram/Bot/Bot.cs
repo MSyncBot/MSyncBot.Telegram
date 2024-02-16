@@ -18,7 +18,7 @@ public class Bot
     
     private string Token { get; }
 
-    public Bot(string token, MLogger logger, MDatabase.MDatabase database)
+    public Bot(string token, MLogger logger)
     {
         Logger = logger;
         Logger.LogProcess("Initializing bot...");
