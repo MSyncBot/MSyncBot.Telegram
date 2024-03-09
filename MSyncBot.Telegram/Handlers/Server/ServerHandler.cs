@@ -16,8 +16,8 @@ public class ServerHandler(string address, int port) : WsClient(address, port)
     public override void OnWsConnecting(HttpRequest request)
     {
         request.SetBegin("GET", "/");
-        request.SetHeader("Host", "localhost");
-        request.SetHeader("Origin", "http://localhost");
+        request.SetHeader("Host", address);
+        request.SetHeader("Origin", $"http://{address}");
         request.SetHeader("Upgrade", "websocket");
         request.SetHeader("Connection", "Upgrade");
         request.SetHeader("Sec-WebSocket-Key", Convert.ToBase64String(WsNonce));
