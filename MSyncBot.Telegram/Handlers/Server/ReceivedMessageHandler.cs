@@ -23,7 +23,7 @@ public class ReceivedMessageHandler
             if (message.Messenger.Type is MessengerType.Telegram)
                 return;
 
-            var chatId = -1001491737336;
+            var chatId = -1001913731159;
             switch (message.Type)
             {
                 case MessageType.Text:
